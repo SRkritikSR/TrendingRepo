@@ -33,7 +33,26 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.marsphotos.model.TrendingRepos
+import com.example.marsphotos.network.MarsPhoto
 
+@Composable
+fun RepoCard(photo: TrendingRepos, modifier: Modifier = Modifier) {
+    AsyncImage(model = ImageRequest.Builder(context = LocalContext.current)
+        .data(photo.items.firstOrNull()?.owner?.avatarUrl)
+        .crossfade(true)
+        .build()
+
+        , contentDescription = stringResource(R.string.avatar_photo),
+
+        error = painterResource(R.drawable.ic_broken_image),
+        placeholder = painterResource(R.drawable.loading_img),
+        modifier=Modifier.fillMaxWidth()
+    )
+}
 @Composable
 fun HomeScreen(
     marsUiState: MarsUiState, modifier: Modifier = Modifier
@@ -44,6 +63,20 @@ fun HomeScreen(
             marsUiState.photos,modifier=modifier.fillMaxWidth()
         )
         is MarsUiState.Error-> ErrorScreen(modifier=modifier.fillMaxSize()
+        )
+    }
+
+}
+@Composable
+fun RepoHomeScreen(
+    repoUiState:RepoUiState, modifier: Modifier = Modifier
+) {
+    when(repoUiState) {
+        is RepoUiState.Loading-> LoadingScreen(modifier=modifier.fillMaxSize())
+        is RepoUiState.Success-> RepoCard(
+            repoUiState.TrendingRepos,modifier=modifier.fillMaxWidth()
+        )
+        is RepoUiState.Error-> ErrorScreen(modifier=modifier.fillMaxSize()
         )
     }
 
