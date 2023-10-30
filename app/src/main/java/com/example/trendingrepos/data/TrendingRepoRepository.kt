@@ -13,6 +13,6 @@
             query = "created:>2023-01-01",
             sort="stars",
             order="desc",
-            per_page = 2,
+            per_page = 20,
         )
     }
