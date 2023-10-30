@@ -4,6 +4,7 @@ package com.example.trendingrepos.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,6 +37,7 @@ import com.example.trendingrepos.R
 import com.example.trendingrepos.model.TrendingRepos
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 
 private const val TAG = "HomeScreen"
@@ -43,9 +46,8 @@ private const val TAG = "HomeScreen"
 
 fun RepoCard(trendingRepos: TrendingRepos, modifier: Modifier = Modifier) {
     val searchText = remember { mutableStateOf("") }
-
     LazyColumn(modifier = modifier) {
-        item {
+                item {
             // Search bar
             TextField(
                 value = searchText.value,
@@ -63,45 +65,114 @@ fun RepoCard(trendingRepos: TrendingRepos, modifier: Modifier = Modifier) {
             // Filter the items based on the search query
             repo.fullName.contains(searchText.value, ignoreCase = true)
         }
-
         items(filteredRepos) { repo ->
-            // Existing code to display each repo
-            val isSelected=remember { mutableStateOf(false) }
-            Row(
+            var isSelected = remember { mutableStateOf(false) }
+            Box(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
                     .clickable {
-                       isSelected.value=!isSelected.value
+                        isSelected.value = !isSelected.value
                     }
-                    .background(if (isSelected.value) Color.Gray else Color.Transparent),
-
-                verticalAlignment = Alignment.CenterVertically
+                    .border(1.dp, if (isSelected.value) Color.Gray else Color.Transparent, shape = RoundedCornerShape(4.dp)) // Border and corner shape
+                    .shadow(4.dp, shape = RoundedCornerShape(4.dp), clip = true) // Box shadow and corner shape
+                    .background(if (isSelected.value) Color.Gray else Color.Transparent), // Background color based on isSelected
+                contentAlignment = Alignment.Center,
             ) {
-                // Display the full name and description on the left
-                Column(
-                    modifier = Modifier.weight(1f)
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = repo.fullName, fontWeight = FontWeight.Bold)
-                    Text(text = repo.description.orEmpty())
+                    // Display the full name and description on the left
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 16.dp),
+                    ) {
+                        Text(text = repo.fullName, fontWeight = FontWeight.Bold)
+                        Text(text = repo.description.orEmpty())
+                    }
+
+                    // Display the avatar image on the right
+                    AsyncImage(
+                        model = ImageRequest.Builder(context = LocalContext.current)
+                            .data(repo.owner?.avatarUrl)
+                            .crossfade(true)
+                            .build(), contentDescription = stringResource(R.string.avatar_photo),
+
+                        error = painterResource(R.drawable.ic_broken_image),
+                        placeholder = painterResource(R.drawable.loading_img),
+                        modifier = Modifier.size(80.dp) // Adjust the size as needed
+                    )
                 }
-
-                // Display the avatar image on the right
-                AsyncImage(
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(repo.owner?.avatarUrl)
-                        .crossfade(true)
-                        .build(), contentDescription = stringResource(R.string.avatar_photo),
-
-                    error = painterResource(R.drawable.ic_broken_image),
-                    placeholder = painterResource(R.drawable.loading_img),
-                    modifier = Modifier.size(72.dp) // You can adjust the size as needed
-                )
             }
         }
     }
 }
 
+//
+//fun RepoCard(trendingRepos: TrendingRepos, modifier: Modifier = Modifier) {
+//    val searchText = remember { mutableStateOf("") }
+//
+//    LazyColumn(modifier = modifier) {
+//        item {
+//            // Search bar
+//            TextField(
+//                value = searchText.value,
+//                onValueChange = { newText ->
+//                    searchText.value=newText
+//                },
+//                label = { Text("Search") },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//            )
+//        }
+
+//        val filteredRepos = trendingRepos.items.filter { repo ->
+//            // Filter the items based on the search query
+//            repo.fullName.contains(searchText.value, ignoreCase = true)
+//        }
+//
+//        items(filteredRepos) { repo ->
+//            // Existing code to display each repo
+//            val isSelected=remember { mutableStateOf(false) }
+//            Row(
+//                modifier = Modifier
+//                    .padding(16.dp)
+//                    .fillMaxWidth()
+//                    .clickable {
+//                        isSelected.value=!isSelected.value
+//                    }
+//                    .background(if (isSelected.value) Color.Gray else Color.Transparent),
+//
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                // Display the full name and description on the left
+//                Column(
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text(text = repo.fullName, fontWeight = FontWeight.Bold)
+//                    Text(text = repo.description.orEmpty())
+//                }
+//
+//                // Display the avatar image on the right
+//                AsyncImage(
+//                    model = ImageRequest.Builder(context = LocalContext.current)
+//                        .data(repo.owner?.avatarUrl)
+//                        .crossfade(true)
+//                        .build(), contentDescription = stringResource(R.string.avatar_photo),
+//
+//                    error = painterResource(R.drawable.ic_broken_image),
+//                    placeholder = painterResource(R.drawable.loading_img),
+//                    modifier = Modifier.size(72.dp) // You can adjust the size as needed
+//                )
+//            }
+//        }
+//    }
+//}
 //fun RepoCard(trendingRepos: TrendingRepos, modifier: Modifier = Modifier) {
 //    LazyColumn(modifier = modifier) {
 //        items(trendingRepos.items) { repo ->
